@@ -29,7 +29,7 @@ function App() {
           <Route path="pay" element={<student.Pay />}></Route>
           <Route path="login" element={<user.Login />}></Route>
           <Route path="register" element={<user.Register />}></Route>
-          <Route path="admin" element={<admin.Admin />}></Route>
+          <Route path="admin/*" element={<admin.Admin />}></Route>
         </Route>
         <Route path="/lecture" element={<student.Lecture />}></Route>
       </Routes>
