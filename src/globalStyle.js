@@ -44,5 +44,24 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+.cropper-crop-box, .cropper-view-box {
+    border-radius: 50%;
+}
 
+.cropper-view-box {
+    box-shadow: 0 0 0 1px #39f;
+    outline: 0;
+}
+
+.cropper-face {
+  background-color:inherit !important;
+}
+
+.cropper-dashed, .cropper-point.point-se, .cropper-point.point-sw, .cropper-point.point-nw,   .cropper-point.point-ne, .cropper-line {
+  display:none !important;
+}
+
+.cropper-view-box {
+  outline:inherit !important;
+}
 `;
