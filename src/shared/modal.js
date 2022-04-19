@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { Button } from "grommet";
-import { useState } from "react";
+
 const ModalLayout = styled.div`
   display: ${({ isOn }) => (isOn ? "block" : "none")}; /* Hidden by default */
   position: fixed;
@@ -12,7 +11,7 @@ const ModalLayout = styled.div`
   width: 50%; /* Could be more or less, depending on screen size */
   & > div {
     width: 100%;
-    height: 50vh;
+    max-height: 50vh;
     padding: 10px 0;
     overflow: scroll;
   }
