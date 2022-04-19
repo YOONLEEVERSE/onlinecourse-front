@@ -1,8 +1,8 @@
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import { useState, useRef } from "react";
+import { useState, useRef, forwardRef } from "react";
 
-export default function CreateBadge(props) {
+function CreateBadge(props, ref) {
   const [state, setState] = useState({ imageSrc: "" });
   const fileInputRef = useRef(null);
   const cropperRef = useRef(null);
@@ -14,13 +14,31 @@ export default function CreateBadge(props) {
     setState((imageSrc) => ({ ...imageSrc, base64: base64Data }));
   }
 
+  function IsOverFileSizeLimit(size) {
+    const LIMIT_SIZE = 500; //제한 : 500KB
+    const fileSize = (size / 1024).toFixed(4); //KB로 바꿈
+    return fileSize > LIMIT_SIZE ? true : false;
+  }
+
   function handleChange(e) {
     const file = fileInputRef.current.files[0];
     const { name, size, type } = file;
+    if (IsOverFileSizeLimit(size)) {
+      throw new Error("file is too big");
+    }
     const imageSrc = URL.createObjectURL(e.target.files[0]);
     setState({ ...state, name, size, type, imageSrc, croppedImgSrc: null });
     fileReader.onloadend = handleFileRead;
     fileReader.readAsBinaryString(file);
+  }
+
+  function handleCropChange() {
+    const croppedImgData = cropperRef.current.cropper.getCroppedCanvas();
+    const roundCroppedImgData = getRoundedCanvas(
+      croppedImgData,
+      64
+    ).toDataURL();
+    setState((state) => ({ ...state, croppedImgSrc: roundCroppedImgData }));
   }
 
   function getRoundedCanvas(sourceCanvas, size = null) {
@@ -45,15 +63,6 @@ export default function CreateBadge(props) {
     context.fill();
     return canvas;
   }
-  function handleCropChange() {
-    console.log("REF", cropperRef.current);
-    const croppedImgData = cropperRef.current.cropper.getCroppedCanvas();
-    const roundCroppedImgData = getRoundedCanvas(
-      croppedImgData,
-      64
-    ).toDataURL();
-    setState((state) => ({ ...state, croppedImgSrc: roundCroppedImgData }));
-  }
 
   return (
     <div>
@@ -62,23 +71,32 @@ export default function CreateBadge(props) {
         accept="image/*"
         ref={fileInputRef}
         onChange={handleChange}
-      />
-      <div>
+      ></input>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
         <Cropper
-          style={{ maxWidth: "600px", height: "400px" }}
+          style={{ maxWidth: "100px", height: "100px" }}
           ref={cropperRef}
           src={state.imageSrc}
           aspectRatio={1}
           cropend={handleCropChange}
           cropBoxResizable={true}
         />
-        <h2>Cropped image preview</h2>
         <img
           src={state.croppedImgSrc}
           style={{ maxWidth: "400px" }}
           alt="크롭된 이미지가 뭔가 잘못됨."
+          ref={ref}
         />
       </div>
     </div>
   );
 }
+
+export default forwardRef(CreateBadge);
