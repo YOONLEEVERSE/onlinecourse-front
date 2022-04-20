@@ -76,10 +76,10 @@ const MultiStepBar = ({ phase }) => {
   useEffect(() => {
     if (phase > 1) {
       const beforeNode = ref.current.childNodes[phase - 2];
-      beforeNode.classList.remove("is-active");
+      beforeNode.classList?.remove("is-active");
     }
     const childNode = ref.current.childNodes[phase - 1];
-    childNode.classList.add("is-active");
+    childNode.classList?.add("is-active");
   }, [phase]);
 
   return (
