@@ -1,19 +1,27 @@
 import { Box, FileInput } from "grommet";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import CreateLecture from "./CreateLecture";
 import ManageTech from "./ManageTech";
+import TechSetting from "./TechSetting";
+import TextForm from "./TextForm";
+import VideoSetting from "./VideoSetting";
 export function Admin() {
   return (
     <>
       <ul>
         <li>
-          <Link to="create-lecture">강의 만들기</Link>
+          <Link to="create-lecture/1">강의 만들기</Link>
           <Link to="manage-tech">테크 추가하기</Link>
         </li>
       </ul>
       <div>
         <Routes>
-          <Route path="create-lecture" element={<CreateLecture />}></Route>
+          <Route path="create-lecture/*" element={<CreateLecture />}>
+            <Route path="1" element={<TextForm />}></Route>
+            <Route path="2" element={<TechSetting />}></Route>
+            <Route path="3" element={<VideoSetting />}></Route>
+            <Route path="4" element={<div>4페이지</div>}></Route>
+          </Route>
           <Route path="manage-tech" element={<ManageTech />}></Route>
         </Routes>
       </div>
