@@ -32,15 +32,12 @@ export const SIGNUP = gql`
 `;
 
 export const VERIFY_EMAIL = gql`
-${ResultInfo}
-    mutation verifyEmail($code:String){
-        {
-            verifyEmail(code:$code){
-                ...ResultInfo
-            }
-        }
-
+  ${ResultInfo}
+  mutation verifyEmail($code: String) {
+    verifyEmail(code: $code) {
+      ...ResultInfo
     }
+  }
 `;
 
 export const RE_ISSUE = gql`
@@ -96,7 +93,15 @@ export const ADD_TECH = gql`
       ...ResultInfo
     }
   }
-``;`;
+`;
+export const ADD_TECH_TEST = gql`
+  ${ResultInfo}
+  mutation addTech($name: String, $logo: Upload) {
+    addTech(name: $name, logo: $logo) {
+      ...ResultInfo
+    }
+  }
+`;
 
 export const REMOVE_TECH = gql`
   ${ResultInfo}
