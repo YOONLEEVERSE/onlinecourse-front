@@ -1,29 +1,15 @@
 import { cloneDeep } from "lodash";
-import { useLayoutEffect, useEffect, useState, useRef } from "react";
+import { useLayoutEffect, useState, useRef, useEffect } from "react";
 
-const dummyVideo = [
-  { title: "video1", time: "60", link: "http://youtube.com", categoryIdx: 0 },
-  { title: "video2", time: "650", link: "http://youtube.com", categoryIdx: 0 },
-  { title: "video3", time: "650", link: "http://youtube.com", categoryIdx: 1 },
-  { title: "video4", time: "650", link: "http://youtube.com", categoryIdx: 1 },
-  { title: "video5", time: "650", link: "http://youtube.com", categoryIdx: 2 },
-];
+const dummyVideo = [{ title: "", time: "", link: "", categoryIdx: 0 }];
 //각 카테고리별 데이터임. 이걸 합쳐서? data를 업데이트 해주면 됨.
-let realdata = [];
-const VideoInfoRow = ({ title, time, link, idx }) => {
+
+const VideoInfoRow = ({ title, time, link, updateVideo }) => {
   const titleRef = useRef(null);
   const timeRef = useRef(null);
   const urlRef = useRef(null);
   return (
-    <div
-      onBlur={(e) => {
-        realdata[idx] = {
-          title: titleRef.current.value,
-          time: timeRef.current.value,
-          link: urlRef.current.value,
-        };
-      }}
-    >
+    <div>
       <input
         type="text"
         ref={titleRef}
@@ -47,8 +33,22 @@ const VideoInfoRow = ({ title, time, link, idx }) => {
     </div>
   );
 };
-const VideoCategory = ({ title, categoryNumber, onChangeTitle }) => {
+const VideoCategory = ({
+  title,
+  categoryNumber,
+  onChangeTitle,
+  onFocusingTitle,
+}) => {
   const [videoData, setVideoData] = useState(null);
+  const titleRef = useRef(null);
+
+  const updateVideo = (idx, title, time, link) => {
+    setVideoData((pre) => {
+      const tmp = cloneDeep(pre);
+      tmp.push({ title, time, link, categoryIdx: idx });
+      return tmp;
+    });
+  };
   useLayoutEffect(() => {
     const data = () => {
       const tmp = dummyVideo.filter(
@@ -57,19 +57,32 @@ const VideoCategory = ({ title, categoryNumber, onChangeTitle }) => {
       return tmp;
     };
     setVideoData(data);
-    realdata = data();
   }, []);
 
+  useEffect(() => {
+    console.log("이번엔 어떻게 됐지?");
+  });
+
   return (
-    <div>
+    <div
+      onBlur={(e) => {
+        e.preventDefault();
+      }}
+    >
       <input
         type="text"
         placeholder="TITLE"
         defaultValue={title}
-        onChange={(e) => {
+        ref={titleRef}
+        onBlur={(e) => {
           e.preventDefault();
-          onChangeTitle(e.target.value, realdata);
+          onChangeTitle(e.target.value);
         }}
+        // onFocus={(e) => {
+        //   e.preventDefault();
+        //   console.log("realdata", realdata);
+        //   onFocusingTitle(e.target.value, realdata);
+        // }}
       />
       {/**카테고리타이틀입니다. */}
       <br />
@@ -78,7 +91,9 @@ const VideoCategory = ({ title, categoryNumber, onChangeTitle }) => {
           title={video.title}
           time={video.time}
           link={video.link}
-          idx={idx}
+          updateVideo={(title, time, link) => {
+            updateVideo(categoryNumber, title, time, link);
+          }}
           key={`VideoInfo-${video.title}-${idx}`}
         />
       ))}
@@ -86,6 +101,7 @@ const VideoCategory = ({ title, categoryNumber, onChangeTitle }) => {
         onClick={(e) => {
           e.preventDefault();
           setVideoData((pre) => {
+            console.log("DPD??", pre);
             const tmp = cloneDeep(pre);
             tmp.push({
               title: "",

@@ -1,7 +1,8 @@
 import { memo, useRef, useState, useEffect } from "react";
+import { useUpdate } from "../../hooks/useUpdate";
 import VideoCategory from "./VideoCategory";
 
-const dummyCategoryName = ["A", "B", "C"];
+const dummyCategoryName = ["bidei", "bedio2"];
 const sumData = [];
 /**
  *  addCourse(
@@ -20,12 +21,23 @@ const sumData = [];
  */
 function VideoSetting() {
   const [categoryName, setCategoryName] = useState(dummyCategoryName);
-  const courseTitleRef = useRef(null);
-  function onChangeTitle(changedTitle, idx, updateData) {
-    const tmp = [...categoryName];
-    tmp.splice(idx, 1, changedTitle);
-    sumData[idx] = { title: changedTitle, video: updateData };
-    setCategoryName(tmp);
+  const [_, updateData] = useUpdate();
+  function onChangeTitle(changedTitle, idx) {
+    console.log("changedTitle", changedTitle);
+    // const tmp = [...categoryName];
+    // tmp.splice(idx, 1, changedTitle);
+    //sumData[idx] = { title: changedTitle, video: updateData };
+    //console.log(sumData);
+    setCategoryName((pre) => {
+      const tmp = [...pre];
+      tmp.splice(idx, 1, changedTitle);
+      return tmp;
+    });
+  }
+
+  function onFocusingTitle(currentTitle, idx, updated) {
+    sumData[idx] = { title: currentTitle, video: updated };
+    updateData(sumData);
   }
 
   return (
@@ -33,19 +45,16 @@ function VideoSetting() {
       <h1>비디오 세팅화면</h1>
 
       <form>
-        <input
-          type="text"
-          placeholder="TITLE"
-          ref={courseTitleRef}
-          defaultValue={"JS 초급반"}
-        />
         <hr></hr>
         {categoryName?.map((category, idx) => {
           return (
             <VideoCategory
               title={category}
-              onChangeTitle={(changedTitle, updateData) => {
-                onChangeTitle(changedTitle, idx, updateData);
+              onChangeTitle={(changedTitle) => {
+                onChangeTitle(changedTitle, idx);
+              }}
+              onFocusingTitle={(currentTitle, updateData) => {
+                onFocusingTitle(currentTitle, idx, updateData);
               }}
               categoryNumber={idx}
               key={`VideoCategory-${category}`}

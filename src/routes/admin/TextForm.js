@@ -1,35 +1,39 @@
 import { useInput } from "../../hooks/useInput";
-import { useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { addNewCouseData } from "../../store/actionCreator";
-import { debounce } from "lodash";
+import { useEffect, useRef } from "react";
+import { useUpdate } from "../../hooks/useUpdate";
 const TextForm = () => {
-  const {
-    state: data,
-    handleChange,
-    handleFile,
-  } = useInput(
+  const { state: data, handleChange } = useInput(
     {
-      title: "",
-      subTitle: "",
-      files: "",
-      mainColor: "#000000",
+      title: "제목",
+      subTitle: "부제목",
+      mainColor: "#7575",
       level: "초급",
       price: "50",
     },
     true
   );
-
-  const dispatch = useDispatch();
-  const updateRedux = useCallback(() => {
-    debounce(() => {
-      dispatch(addNewCouseData(data));
-    }, 200);
-  }, [data, dispatch]);
+  const fileRef = useRef(null);
+  const [reduxData, updateData] = useUpdate();
 
   useEffect(() => {
-    updateRedux();
-  }, [data, dispatch]);
+    let file = fileRef.current?.files[0];
+    updateData({ ...data, price: +data.price, logo: file ?? "" });
+    // if (file) {
+    //   // const toBase64 = new Promise((resolve, reject) => {
+    //   //   const fileReader = new FileReader();
+    //   //   fileReader.readAsDataURL(file);
+    //   //   fileReader.onloadend = () => resolve(fileReader.result);
+    //   //   fileReader.onerror = (e) => reject(new Error(e));
+    //   // });
+    //   // (async () => {
+    //   //   const file = await toBase64;
+    //   //   updateData({ ...data, price: +data.price, logo: file });
+    //   // })();
+    //   updateData({ ...data, price: +data.price, logo: file });
+    // } else {
+    //   updateData({ ...data, price: +data.price, logo: "" });
+    // }
+  }, [data]);
 
   return (
     <form autoComplete="off">
@@ -50,7 +54,7 @@ const TextForm = () => {
         onChange={handleChange}
       ></input>
       <label htmlFor="logo">로고</label>
-      <input type="file" onChange={handleFile}></input>
+      <input type="file" ref={fileRef}></input>
       <label htmlFor="maincolor">메인컬러</label>
       <input
         type="color"

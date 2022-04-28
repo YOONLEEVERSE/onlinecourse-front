@@ -1,10 +1,11 @@
 import { Box, FileInput } from "grommet";
 import { Routes, Route, Link } from "react-router-dom";
 import CreateLecture from "./CreateLecture";
+import LastPage from "./LastPage";
 import ManageTech from "./ManageTech";
 import TechSetting from "./TechSetting";
 import TextForm from "./TextForm";
-import VideoSetting from "./VideoSetting";
+import VideoSetting from "./tVideoSetting";
 export function Admin() {
   return (
     <>
@@ -20,7 +21,7 @@ export function Admin() {
             <Route path="1" element={<TextForm />}></Route>
             <Route path="2" element={<TechSetting />}></Route>
             <Route path="3" element={<VideoSetting />}></Route>
-            <Route path="4" element={<div>4페이지</div>}></Route>
+            <Route path="4" element={<LastPage />}></Route>
           </Route>
           <Route path="manage-tech" element={<ManageTech />}></Route>
         </Routes>

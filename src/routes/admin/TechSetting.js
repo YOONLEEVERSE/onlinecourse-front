@@ -1,31 +1,31 @@
-import { useMutation, gql } from "@apollo/client";
 import { Heading } from "grommet";
 import styled from "styled-components";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
+import { useUpdate } from "../../hooks/useUpdate";
 const techDummyData = {
   getAllTech: [
     {
-      id: 1,
+      id: 2,
       title: "JS",
       logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/JS.png",
     },
     {
-      id: 3,
+      id: 2,
       title: "react",
       logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/React_Z6rkrgv.png",
     },
     {
-      id: 5,
+      id: 2,
       title: "graphql",
       logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/Graph_QL.png",
     },
     {
-      id: 6,
+      id: 2,
       title: "redux",
       logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/reduxBadge.png",
     },
     {
-      id: 8,
+      id: 2,
       title: "typescript",
       logo: "https://nomadcoders.co/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Ftypescript.791deeef.png&w=3840&q=75",
     },
@@ -69,9 +69,16 @@ const techDummyData = {
 const Img = styled.img`
   width: ${(props) => props.size ?? 60}px;
 `;
-export default function TechSetting() {
+function TechSetting() {
   const [data, setData] = useState(techDummyData);
-  const [selected, setSelected] = useState({ courses: [], techs: [] });
+
+  const [selected, setSelected] = useState({ prerequisite: [], mainTechs: [] });
+  const [_, updateData] = useUpdate();
+
+  useEffect(() => {
+    updateData(selected);
+  }, [selected]);
+
   const Techs = () => {
     return useMemo(() => {
       return (
@@ -79,7 +86,7 @@ export default function TechSetting() {
           {data.getAllTech.map((tech) => {
             return (
               <Img
-                key={`tech-${tech.title}`}
+                key={`tech-${tech.id}`}
                 src={
                   tech.logo ??
                   "https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png"
@@ -88,8 +95,8 @@ export default function TechSetting() {
                 onClick={(e) => {
                   e.preventDefault();
                   setSelected((selected) => ({
-                    courses: [...selected.courses],
-                    techs: [...selected.techs, tech.title],
+                    prerequisite: [...selected.prerequisite],
+                    mainTechs: [...selected.mainTechs, tech.id],
                   }));
                 }}
               ></Img>
@@ -103,33 +110,28 @@ export default function TechSetting() {
     return useMemo(() => {
       return (
         <>
-          {data.getAllCourse.map((course) => {
-            return (
-              <Img
-                size={250}
-                key={`course-${course.title}`}
-                src={
-                  course.logo ??
-                  "https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png"
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelected((selected) => ({
-                    techs: [...selected.techs],
-                    courses: [...selected.courses, course.title],
-                  }));
-                }}
-                alt="이미지"
-              ></Img>
-            );
-          })}
+          {data.getAllCourse.map((course) => (
+            <Img
+              size={250}
+              key={`course-${course.courseId}`}
+              src={
+                course.logo ??
+                "https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png"
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                setSelected((selected) => ({
+                  mainTechs: [...selected.mainTechs],
+                  courses: [...selected.prerequisite, course.courseId],
+                }));
+              }}
+              alt="이미지"
+            ></Img>
+          ))}
         </>
       );
     }, [data.getAllTech]);
   };
-  useEffect(() => {
-    console.log("하하퍼니", selected);
-  }, [selected]);
 
   return (
     <>
@@ -142,12 +144,15 @@ export default function TechSetting() {
         선택한 코스
       </Heading>
 
-      {selected.courses &&
-        selected.courses.map((course) => <p key={course}>{course}</p>)}
+      {selected.prerequisite &&
+        selected.prerequisite.map((course) => <p key={course}>{course}</p>)}
       <Heading size="medium" level={3}>
         선택한 테크
       </Heading>
-      {selected.techs && selected.techs.map((tech) => <p key={tech}>{tech}</p>)}
+      {selected.mainTechs &&
+        selected.mainTechs.map((tech) => <p key={tech}>{tech}</p>)}
     </>
   );
 }
+
+export default memo(TechSetting);
