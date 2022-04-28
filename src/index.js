@@ -2,16 +2,13 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
-import { GlobalTheme } from "./globalStyle";
 import { Provider } from "react-redux";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
+import { GlobalTheme } from "./globalStyle";
 import store from "./store/index";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { createUploadLink } from "apollo-upload-client";
+
 //import { WebSocketLink } from "@apollo/client/link/ws";
 //bottom. for the subscriptions apollo client에서 추천하는 최신버전. 근데 서버에서 apollo-server말고 다른 거 써서 거기 버전에 맞게 수정했음.
 //import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
@@ -24,9 +21,9 @@ const root = createRoot(container);
 // const wsLink = new WebSocketLink({
 //   uri: "ws://192.168.219.110:8080/subscriptions",
 // });
-//uri: "http://180.231.130.252:8000/graphql",
 //uri: "http://online-course-api.kro.kr:8000/graphql",
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
+  //createHttpLink로 다시 바꾸기
   credentials: "same-origin",
   uri: "http://192.168.219.100:8000/graphql",
 }); //for the mutation and query. 한번 연결하고 데이터 주고 받고 끊고,, mutation과 query는 굳이 websocket이 필요X

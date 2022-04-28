@@ -94,6 +94,14 @@ export const ADD_TECH = gql`
     }
   }
 `;
+export const ADD_TECH_TEST = gql`
+  ${ResultInfo}
+  mutation addTech($name: String, $logo: Upload) {
+    addTech(name: $name, logo: $logo) {
+      ...ResultInfo
+    }
+  }
+`;
 
 export const REMOVE_TECH = gql`
   ${ResultInfo}

@@ -2,7 +2,7 @@ import { Button, FileInput, Form, FormField, TextInput } from "grommet";
 import { useMutation, useQuery } from "@apollo/client";
 import { Add } from "grommet-icons";
 import { GET_ALL_TECH } from "../../graphql/query";
-import { ADD_TECH } from "../../graphql/mutation";
+import { ADD_TECH_TEST } from "../../graphql/mutation";
 import { useState, useRef } from "react";
 import CreateBadge from "./CreateBadge";
 import Modal from "../../shared/modal";
@@ -24,13 +24,12 @@ function ManageTech({ tech = dummyTech }) {
   const { data, loading, error } = useQuery(GET_ALL_TECH, {
     onCompleted: (data) => console.log("가져오기 성공", data),
   });
-  const [addTechMutation] = useMutation(ADD_TECH, {
+  const [addTechMutation] = useMutation(ADD_TECH_TEST, {
     onCompleted: (data) => console.log("등록 완", data),
     onError: (error) => console.log("등록 실패", error),
   });
 
   const Techs = ({ techlist = dummyTech }) => {
-    console.log("techlist", techlist);
     return (
       <>
         {techlist.map((tech) => {
@@ -63,16 +62,20 @@ function ManageTech({ tech = dummyTech }) {
       <div>
         <FormField label="추가할 테크 이름">
           <TextInput name="title" ref={titleRef}></TextInput>
+          <input type="file" ref={ResultImgRef}></input>
         </FormField>
-        <CreateBadge ref={ResultImgRef} />
+        {/* <CreateBadge ref={ResultImgRef} />
+         */}
+
         <Button onClick={() => setIsOn(false)}>취소하기</Button>
         <Button
           primary
           onClick={() => {
-            const imgSrc = ResultImgRef.current?.currentSrc;
+            //const imgSrc = ResultImgRef.current?.currentSrc;
+            const imgSrc = ResultImgRef.current?.files[0];
             const title = titleRef.current?.value;
+            console.log("하이", imgSrc, title);
             if (imgSrc && title) {
-              console.log("보내두됨", imgSrc, title);
               addTechMutation({
                 variables: {
                   name: title,
