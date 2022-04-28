@@ -1,4 +1,4 @@
-import { Button, FileInput, Form, FormField, TextInput } from "grommet";
+import { Button, FormField, TextInput } from "grommet";
 import { useMutation, useQuery } from "@apollo/client";
 import { Add } from "grommet-icons";
 import { GET_ALL_TECH } from "../../graphql/query";
@@ -21,13 +21,16 @@ function ManageTech({ tech = dummyTech }) {
   const [isOn, setIsOn] = useState(false);
   const ResultImgRef = useRef(null);
   const titleRef = useRef(null);
-  const { data, loading, error } = useQuery(GET_ALL_TECH, {
-    onCompleted: (data) => console.log("가져오기 성공", data),
-  });
-  const [addTechMutation] = useMutation(ADD_TECH_TEST, {
-    onCompleted: (data) => console.log("등록 완", data),
-    onError: (error) => console.log("등록 실패", error),
-  });
+  const { data, loading } = useQuery(GET_ALL_TECH);
+  const [addTechMutation] = useMutation(ADD_TECH_TEST);
+  //gql에 추가할 때 input:{name:"name",logo:"base64"} 형태로 넣어줘야 함.
+  const AddTechBtn = ({ onClick }) => {
+    return (
+      <Button onClick={onClick} primary>
+        <Add color="white" />
+      </Button>
+    );
+  };
 
   const Techs = ({ techlist = dummyTech }) => {
     return (
@@ -48,38 +51,32 @@ function ManageTech({ tech = dummyTech }) {
       </>
     );
   };
-  //gql에 추가할 때 input:{name:"name",logo:"base64"} 형태로 넣어줘야 함.
-  const AddTechBtn = ({ onClick }) => {
-    return (
-      <Button onClick={onClick} primary>
-        <Add color="white" />
-      </Button>
-    );
-  };
 
   const AddTech = () => {
     return (
       <div>
         <FormField label="추가할 테크 이름">
           <TextInput name="title" ref={titleRef}></TextInput>
-          <input type="file" ref={ResultImgRef}></input>
         </FormField>
-        {/* <CreateBadge ref={ResultImgRef} />
-         */}
-
+        <CreateBadge ref={ResultImgRef}></CreateBadge>
         <Button onClick={() => setIsOn(false)}>취소하기</Button>
         <Button
           primary
-          onClick={() => {
-            //const imgSrc = ResultImgRef.current?.currentSrc;
-            const imgSrc = ResultImgRef.current?.files[0];
+          onClick={async () => {
+            const imgSrc = ResultImgRef.current?.src; //파일 그대로 업로드~
+            const imgBlob = await (await fetch(imgSrc)).blob(); //base64 to blob
             const title = titleRef.current?.value;
-            console.log("하이", imgSrc, title);
-            if (imgSrc && title) {
+            const imgFile = new File(
+              [imgBlob],
+              `${title}-${new Date().getTime()}`,
+              { lastModified: new Date().getTime(), type: imgBlob.type }
+            ); //blob to file
+
+            if (imgFile && title) {
               addTechMutation({
                 variables: {
                   name: title,
-                  logo: imgSrc,
+                  logo: imgFile,
                 },
               });
             }
@@ -87,7 +84,6 @@ function ManageTech({ tech = dummyTech }) {
         >
           추가하기
         </Button>
-        {/**클릭했을 때 테크 추가해야함. name, logo 알아야 함.*/}
       </div>
     );
   };
@@ -95,8 +91,7 @@ function ManageTech({ tech = dummyTech }) {
   return (
     <>
       {loading && <p>로딩중...</p>}
-      {data && <Techs techlist={data.getAllTech}></Techs>}
-      {/* <Techs techlist={tech}></Techs> */}
+      {data && <Techs techlist={data.getAllTech} />}
       <AddTechBtn
         onClick={(e) => {
           e.preventDefault();
