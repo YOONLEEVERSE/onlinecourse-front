@@ -1,4 +1,3 @@
-import { Box, FileInput } from "grommet";
 import { Routes, Route, Link } from "react-router-dom";
 import CreateLecture from "./CreateLecture";
 import LastPage from "./LastPage";

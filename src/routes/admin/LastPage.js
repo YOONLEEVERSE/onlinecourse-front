@@ -5,15 +5,7 @@ import { useEffect } from "react";
 function LastPage() {
   const data1 = useSelector((state) => state.newCourse);
   const data2 = useSelector((state) => state.addCourseInput);
-  /**  $title: String
-    $subTitle: String
-    $logo: String
-    $mainColor: String
-    $level: String
-    $price: Int
-    $mainTechs: [Long]
-    $prerequisite: [String]
-    $videoCategories: [CategoryInput] */
+
   const [addCourse] = useMutation(ADD_COURSE);
   useEffect(() => {
     console.log("보낼 데이터", { ...data1, videoCategories: data2 });

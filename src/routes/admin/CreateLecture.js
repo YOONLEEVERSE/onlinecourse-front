@@ -1,5 +1,3 @@
-import { useQuery } from "@apollo/client";
-import { GET_ALL_TECH } from "../../graphql/query";
 import AddCourse from "./AddCourse";
 
 const dummyTech = [
