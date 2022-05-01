@@ -1,6 +1,7 @@
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { useState, useRef, forwardRef } from "react";
+import { BadgeImg } from "../../shared/Image";
 
 function CreateBadge(props, ref) {
   const [state, setState] = useState({ imageSrc: "" });
@@ -11,11 +12,15 @@ function CreateBadge(props, ref) {
   function handleFileRead() {
     const binaryData = fileReader.result;
     const base64Data = window.btoa(binaryData);
-    setState((imageSrc) => ({ ...imageSrc, base64: base64Data }));
+    setState((imageSrc) => ({
+      ...imageSrc,
+      base64: base64Data,
+      croppedImgSrc: "",
+    }));
   }
 
   function IsOverFileSizeLimit(size) {
-    const LIMIT_SIZE = 500; //제한 : 500KB
+    const LIMIT_SIZE = 1024; //제한 : 1MB
     const fileSize = (size / 1024).toFixed(4); //KB로 바꿈
     return fileSize > LIMIT_SIZE ? true : false;
   }
@@ -27,25 +32,16 @@ function CreateBadge(props, ref) {
       throw new Error("file is too big");
     }
     const imageSrc = URL.createObjectURL(e.target.files[0]);
-    setState({ ...state, name, size, type, imageSrc, croppedImgSrc: null });
+    setState({ ...state, name, size, type, imageSrc, croppedImgSrc: imageSrc });
     fileReader.onloadend = handleFileRead;
     fileReader.readAsBinaryString(file);
   }
 
-  function handleCropChange() {
-    const croppedImgData = cropperRef.current.cropper.getCroppedCanvas();
-    const roundCroppedImgData = getRoundedCanvas(
-      croppedImgData,
-      64
-    ).toDataURL();
-    setState((state) => ({ ...state, croppedImgSrc: roundCroppedImgData }));
-  }
-
-  function getRoundedCanvas(sourceCanvas, size = null) {
+  function getRoundedCanvas(sourceCanvas) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-    const width = size || sourceCanvas.width;
-    const height = size || sourceCanvas.height;
+    const width = sourceCanvas.width;
+    const height = sourceCanvas.height;
     canvas.width = width;
     canvas.height = height;
     context.imageSmoothingEnabled = true;
@@ -64,6 +60,12 @@ function CreateBadge(props, ref) {
     return canvas;
   }
 
+  function handleCropChange() {
+    const croppedImgData = cropperRef.current.cropper.getCroppedCanvas();
+    const roundCroppedImgData = getRoundedCanvas(croppedImgData).toDataURL();
+    setState((state) => ({ ...state, croppedImgSrc: roundCroppedImgData }));
+  }
+
   return (
     <div>
       <input
@@ -71,7 +73,7 @@ function CreateBadge(props, ref) {
         accept="image/*"
         ref={fileInputRef}
         onChange={handleChange}
-      ></input>
+      />
       <div
         style={{
           display: "flex",
@@ -88,12 +90,7 @@ function CreateBadge(props, ref) {
           cropend={handleCropChange}
           cropBoxResizable={true}
         />
-        <img
-          src={state.croppedImgSrc}
-          style={{ maxWidth: "400px" }}
-          alt="크롭된 이미지가 뭔가 잘못됨."
-          ref={ref}
-        />
+        <BadgeImg src={state.croppedImgSrc} ref={ref} />
       </div>
     </div>
   );
