@@ -2,13 +2,15 @@ import { Heading, Grid, Box, Button } from "grommet";
 import { AddCircle } from "grommet-icons";
 import Banner from "../../shared/banner";
 import styled from "styled-components";
-import { memo, useCallback, useEffect, useState } from "react";
-const TechButton = ({ onClick, techName }) => (
+import { useEffect, useState, memo } from "react";
+import { useQuery, gql } from "@apollo/client";
+
+const TechButton = memo(({ onClick, techName }) => (
   <div onClick={onClick}>
     <AddCircle />
     <Button>{techName}</Button>
   </div>
-);
+));
 
 const TechBox = styled.div`
   width: 100%;
@@ -107,25 +109,81 @@ const Filtering = ({ onChangeFilter }) => {
 };
 
 //필터설정된 것에 따라
+/**
+ * 
+ * @returns   
+ * 
+ *  getAllCourse {
+      title
+      slug
+      subTitle
+      logo
+      mainColor
+      level
+      price
+      mainTechs {
+        id
+        name
+        logo
+      }
+      prerequisite {
+        title
+      }
+      videoCategories {
+        categoryId
+        title
+        videos {
+          videoId
+          title
+          time
+          link
+        }
+      }
+    }
+  }
+ */
+const GET_ALL_COURSE = gql`
+  query getAllCourse {
+    getAllCourse {
+      title
+      subTitle
+      mainTechs {
+        name
+      }
+      level
+      price
+      logo
+    }
+  }
+`;
 
 export function CourseList() {
-  const [techs] = useState([
-    { mainTechs: ["A", "B"], level: "초급", price: 3000 },
-    { mainTechs: ["A"], level: "중급", price: 1000 },
-    { mainTechs: ["C", "D"], level: "고급", price: 5000 },
-    { mainTechs: ["B", "D"], level: "고급", price: 3000 },
-    { mainTechs: ["D"], level: "초급", price: 3000 },
-    { mainTechs: ["A", "B", "C", "D"], level: "중급", price: 4000 },
-    { mainTechs: ["B", "C"], level: "고급", price: 6000 },
-    { mainTechs: ["A", "D"], level: "초급", price: 2000 },
-    { mainTechs: ["A", "C"], level: "중급", price: 3000 },
-  ]);
-  const [filteterdTechs, setFilteredTechs] = useState(techs);
+  // const [techs] = useState([
+  //   { mainTechs: ["A", "B"], level: "초급", price: 3000 },
+  //   { mainTechs: ["A"], level: "중급", price: 1000 },
+  //   { mainTechs: ["C", "D"], level: "고급", price: 5000 },
+  //   { mainTechs: ["B", "D"], level: "고급", price: 3000 },
+  //   { mainTechs: ["D"], level: "초급", price: 3000 },
+  //   { mainTechs: ["A", "B", "C", "D"], level: "중급", price: 4000 },
+  //   { mainTechs: ["B", "C"], level: "고급", price: 6000 },
+  //   { mainTechs: ["A", "D"], level: "초급", price: 2000 },
+  //   { mainTechs: ["A", "C"], level: "중급", price: 3000 },
+  // ]);
+  const [filteredTechs, setFilteredTechs] = useState(null);
+  const {
+    data: techs,
+    error,
+    loading,
+  } = useQuery(GET_ALL_COURSE, {
+    onCompleted: (data) => {
+      setFilteredTechs(data.getAllCourse);
+    },
+  });
 
   function filteringTech(filter) {
     const filteredByLevel = filter.level
-      ? techs.filter((d) => d.level === filter.level)
-      : techs;
+      ? techs.getAllCourse.filter((d) => d.level === filter.level)
+      : techs.getAllCourse;
 
     const filteredByPrice = filter.price
       ? filteredByLevel.filter((d) => {
@@ -143,25 +201,38 @@ export function CourseList() {
       ? filteredByPrice.filter((d) => d.mainTechs.includes(filter.tech))
       : filteredByPrice;
 
-    if (filteterdTechs !== filteredByTech) {
+    if (filteredTechs !== filteredByTech) {
       setFilteredTechs(filteredByTech);
     }
   }
 
-  return (
-    <>
-      <Heading level="3" size="medium">
-        All Courses
-      </Heading>
-      <Heading level="4" size="medium">
-        초급부터 고급까지!
-      </Heading>
-      <Filtering onChangeFilter={filteringTech} />
-      <TechBox>
-        {filteterdTechs.map((tech, idx) => (
-          <Banner techs={tech.mainTechs} level={tech.level} key={idx}></Banner>
-        ))}
-      </TechBox>
-    </>
-  );
+  if (techs) {
+    return (
+      <>
+        <Heading level="3" size="medium">
+          All Courses
+        </Heading>
+        <Heading level="4" size="medium">
+          초급부터 고급까지!
+        </Heading>
+        <Filtering onChangeFilter={filteringTech} />
+        <TechBox>
+          {filteredTechs &&
+            filteredTechs.map((tech, idx) => (
+              <Banner
+                title={tech.title}
+                subTitle={tech.subTitle}
+                level={tech.level}
+                imgSrc={tech.logo}
+                key={idx}
+              ></Banner>
+            ))}
+        </TechBox>
+      </>
+    );
+  } else if (loading) {
+    return <>로딩중</>;
+  } else if (error) {
+    return <>에러발생</>;
+  }
 }

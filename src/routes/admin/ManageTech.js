@@ -21,7 +21,9 @@ function ManageTech({ tech = dummyTech }) {
   const [isOn, setIsOn] = useState(false);
   const ResultImgRef = useRef(null);
   const titleRef = useRef(null);
-  const { data, loading } = useQuery(GET_ALL_TECH);
+  const { data, loading, refetch } = useQuery(GET_ALL_TECH, {
+    fetchPolicy: "network-only",
+  });
   const [addTechMutation] = useMutation(ADD_TECH_TEST);
   //gql에 추가할 때 input:{name:"name",logo:"base64"} 형태로 넣어줘야 함.
   const AddTechBtn = ({ onClick }) => {
@@ -68,10 +70,10 @@ function ManageTech({ tech = dummyTech }) {
             const title = titleRef.current?.value;
             const imgFile = new File(
               [imgBlob],
-              `${title}-${new Date().getTime()}`,
+              `${title}_${new Date().getTime()}.png`,
               { lastModified: new Date().getTime(), type: imgBlob.type }
             ); //blob to file
-
+            console.log("base64", imgSrc, "blob", imgBlob, "file", imgFile);
             if (imgFile && title) {
               addTechMutation({
                 variables: {
@@ -80,6 +82,8 @@ function ManageTech({ tech = dummyTech }) {
                 },
               });
             }
+            refetch();
+            setIsOn(false);
           }}
         >
           추가하기
