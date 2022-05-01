@@ -1,3 +1,4 @@
+import { Heading } from "grommet";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -18,7 +19,8 @@ const Wrapper = styled.div`
 `;
 
 const LevelTag = styled.div`
-  background-color: ${(props) => ["green", "orange", "red"][props.level]};
+  background-color: ${(props) =>
+    ["green", "orange", "red"][["초급", "중급", "고급"].indexOf(props.level)]};
   color: white;
   text-align: center;
   line-height: 30px;
@@ -27,7 +29,7 @@ const LevelTag = styled.div`
   border-radius: 50px;
 `;
 
-const Tech = styled.div`
+const Description = styled.div`
   width: 250px;
   height: 3rem;
   background-color: #262626;
@@ -39,14 +41,22 @@ const Tech = styled.div`
 `;
 function Banner({
   imgSrc = `${process.env.PUBLIC_URL}/img/MOKOKO_04.png`,
-  techs = ["A", "B", "C", "D"],
-  level = 1,
+  level = "초급",
+  title = "title",
+  subTitle = "subTitle",
 }) {
   return (
     <Wrapper>
-      <LevelTag level={level}>{["초급", "중급", "고급"][level]}</LevelTag>
+      <LevelTag level={level}>{level}</LevelTag>
       <img src={imgSrc} alt="Something went Wrong"></img>
-      <Tech>{techs}</Tech>
+      <Description>
+        <Heading size="small" level="2">
+          {title}
+        </Heading>
+        <Heading size="small" level="4">
+          {subTitle}
+        </Heading>
+      </Description>
     </Wrapper>
   );
 }
