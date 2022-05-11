@@ -23,19 +23,24 @@ export const GET_ALL_TECH = gql`
 export const GET_ALL_COURSE = gql`
   query getAllCourse {
     getAllCourse {
-      courseId
       title
+      slug
       subTitle
       logo
       mainColor
       level
       price
+      isEnrolled
+      progress
+      progressVideos
       mainTechs {
         id
         name
         logo
       }
-      prerequisite
+      prerequisite {
+        title
+      }
       videoCategories {
         categoryId
         title

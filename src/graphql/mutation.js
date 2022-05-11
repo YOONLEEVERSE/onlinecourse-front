@@ -7,6 +7,8 @@ export const SIGNIN = gql`
       user {
         ...UserInfo
       }
+      accessToken
+      success
     }
   }
 `;
@@ -88,12 +90,12 @@ export const REMOVE_USER = gql`
 
 export const ADD_TECH = gql`
   ${ResultInfo}
-  mutation addTech($name: String, $logo: String) {
+  mutation addTech($name: String, $logo: Upload) {
     addTech(input: { name: $name, logo: $logo }) {
       ...ResultInfo
     }
   }
-`;
+`; //logo 업로드 타입이 바뀌었음!
 export const ADD_TECH_TEST = gql`
   ${ResultInfo}
   mutation addTech($name: String, $logo: Upload) {
@@ -117,7 +119,7 @@ export const ADD_COURSE = gql`
   mutation addCourse(
     $title: String
     $subTitle: String
-    $logo: String
+    $logo: Upload
     $mainColor: String
     $level: String
     $price: Int
@@ -129,7 +131,6 @@ export const ADD_COURSE = gql`
       input: {
         title: $title
         subTitle: $subTitle
-        logo: $logo
         mainColor: $mainColor
         level: $level
         price: $price
@@ -137,6 +138,7 @@ export const ADD_COURSE = gql`
         prerequisite: $prerequisite
         videoCategories: $videoCategories
       }
+      logo: $logo
     ) {
       ...ResultInfo
     }
