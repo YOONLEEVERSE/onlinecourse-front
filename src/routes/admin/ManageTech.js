@@ -3,38 +3,29 @@ import { useMutation, useQuery } from "@apollo/client";
 import { Add } from "grommet-icons";
 import { GET_ALL_TECH } from "../../graphql/query";
 import { ADD_TECH_TEST } from "../../graphql/mutation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import CreateBadge from "./CreateBadge";
 import Modal from "../../shared/modal";
-const dummyTech = [
-  {
-    name: "react",
-    logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/React_Z6rkrgv.png",
-  },
-  {
-    name: "redux",
-    logo: "https://d1telmomo28umc.cloudfront.net/media/public/badges/reduxBadge.png",
-  },
-];
 
-function ManageTech({ tech = dummyTech }) {
+function ManageTech() {
   const [isOn, setIsOn] = useState(false);
   const ResultImgRef = useRef(null);
   const titleRef = useRef(null);
-  const { data, loading, refetch } = useQuery(GET_ALL_TECH, {
-    fetchPolicy: "network-only",
+  const { data, loading, refetch } = useQuery(GET_ALL_TECH);
+  const [addTechMutation] = useMutation(ADD_TECH_TEST, {
+    onCompleted: () => refetch(),
   });
-  const [addTechMutation] = useMutation(ADD_TECH_TEST);
-  //gql에 추가할 때 input:{name:"name",logo:"base64"} 형태로 넣어줘야 함.
+
   const AddTechBtn = ({ onClick }) => {
     return (
       <Button onClick={onClick} primary>
         <Add color="white" />
+        기술 추가하기
       </Button>
     );
   };
 
-  const Techs = ({ techlist = dummyTech }) => {
+  const Techs = ({ techlist }) => {
     return (
       <>
         {techlist.map((tech) => {
@@ -44,6 +35,7 @@ function ManageTech({ tech = dummyTech }) {
                 display: "inline-block",
                 width: "70px",
               }}
+              key={tech.name}
             >
               <img alt="이미지 없음" src={tech.logo} width="64px"></img>
               <p style={{ textAlign: "center" }}>{tech.name}</p>
@@ -73,7 +65,6 @@ function ManageTech({ tech = dummyTech }) {
               `${title}_${new Date().getTime()}.png`,
               { lastModified: new Date().getTime(), type: imgBlob.type }
             ); //blob to file
-            console.log("base64", imgSrc, "blob", imgBlob, "file", imgFile);
             if (imgFile && title) {
               addTechMutation({
                 variables: {
@@ -82,7 +73,6 @@ function ManageTech({ tech = dummyTech }) {
                 },
               });
             }
-            refetch();
             setIsOn(false);
           }}
         >
