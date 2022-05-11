@@ -1,121 +1,101 @@
+import { Button, FormField, TextInput } from "grommet";
 import { cloneDeep } from "lodash";
-import { useLayoutEffect, useState, useRef, useEffect } from "react";
+import { memo, useState } from "react";
+import { updateNewcourse } from "../../store/actionCreator";
+import { useDispatch } from "react-redux";
 
-const dummyVideo = [{ title: "", time: "", link: "", categoryIdx: 0 }];
-//각 카테고리별 데이터임. 이걸 합쳐서? data를 업데이트 해주면 됨.
-
-const VideoInfoRow = ({ title, time, link, updateVideo }) => {
-  const titleRef = useRef(null);
-  const timeRef = useRef(null);
-  const urlRef = useRef(null);
+const VideoInfo = memo(({ videoData, updateVideoData }) => {
   return (
-    <div>
-      <input
-        type="text"
-        ref={titleRef}
-        placeholder="videoname"
-        defaultValue={title}
-      ></input>
-      <input
-        type="text"
-        ref={timeRef}
-        placeholder="video time"
-        defaultValue={time}
-      ></input>
-      <input
-        type="url"
-        ref={urlRef}
-        placeholder="video link"
-        defaultValue={link}
-      ></input>
-      <br />
-      <hr />
-    </div>
+    <FormField label="비디오 정보">
+      <TextInput
+        value={videoData.title}
+        name="title"
+        placeholder="강의 이름을 적어주세요"
+        onChange={(e) => updateVideoData(e)}
+      ></TextInput>
+      <TextInput
+        value={videoData.time}
+        name="time"
+        placeholder="비디오 시간을 입력해주세요"
+        onChange={(e) => updateVideoData(e)}
+      ></TextInput>
+      <TextInput
+        value={videoData.link}
+        name="link"
+        placeholder="비디오 링크를 걸어주세요"
+        onChange={(e) => updateVideoData(e)}
+      ></TextInput>
+    </FormField>
   );
-};
-const VideoCategory = ({
-  title,
-  categoryNumber,
-  onChangeTitle,
-  onFocusingTitle,
-}) => {
-  const [videoData, setVideoData] = useState(null);
-  const titleRef = useRef(null);
+});
 
-  const updateVideo = (idx, title, time, link) => {
+function VideoData({ categoryIdx }) {
+  const [categoryName, setCategoryName] = useState();
+  const [videoData, setVideoData] = useState([
+    { title: "", time: 0, link: "", freePreview: true, text: "" },
+  ]);
+  const dispatch = useDispatch();
+
+  const updateCategoryName = (e) => {
+    e.preventDefault();
+    setCategoryName(e.target.value);
+  };
+
+  const updateVideoData = (idx, e) => {
+    e.preventDefault();
     setVideoData((pre) => {
       const tmp = cloneDeep(pre);
-      tmp.push({ title, time, link, categoryIdx: idx });
+      tmp[idx][e.target.name] = e.target.value;
       return tmp;
     });
   };
-  useLayoutEffect(() => {
-    const data = () => {
-      const tmp = dummyVideo.filter(
-        (video) => video.categoryIdx === categoryNumber
-      );
-      return tmp;
-    };
-    setVideoData(data);
-  }, []);
 
-  useEffect(() => {
-    console.log("이번엔 어떻게 됐지?");
-  });
+  const addVideoData = () => {
+    setVideoData((pre) => {
+      const tmp = cloneDeep(pre);
+      tmp.push({
+        title: "",
+        time: 0,
+        link: "",
+        freePreview: true,
+        text: "",
+      });
+      return tmp;
+    });
+  };
+
+  const handleOnBlur = () => {
+    dispatch(updateNewcourse(categoryIdx, categoryName, videoData));
+  };
 
   return (
-    <div
-      onBlur={(e) => {
-        e.preventDefault();
-      }}
-    >
-      <input
-        type="text"
-        placeholder="TITLE"
-        defaultValue={title}
-        ref={titleRef}
-        onBlur={(e) => {
-          e.preventDefault();
-          onChangeTitle(e.target.value);
-        }}
-        // onFocus={(e) => {
-        //   e.preventDefault();
-        //   console.log("realdata", realdata);
-        //   onFocusingTitle(e.target.value, realdata);
-        // }}
-      />
-      {/**카테고리타이틀입니다. */}
-      <br />
-      {videoData?.map((video, idx) => (
-        <VideoInfoRow
-          title={video.title}
-          time={video.time}
-          link={video.link}
-          updateVideo={(title, time, link) => {
-            updateVideo(categoryNumber, title, time, link);
-          }}
-          key={`VideoInfo-${video.title}-${idx}`}
-        />
-      ))}
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          setVideoData((pre) => {
-            console.log("DPD??", pre);
-            const tmp = cloneDeep(pre);
-            tmp.push({
-              title: "",
-              time: 0,
-              link: "",
-              categoryIdx: categoryNumber,
-            });
-            return tmp;
-          });
-        }}
-      >
-        +Add Video
-      </button>
-    </div>
+    <>
+      <div onBlur={handleOnBlur}>
+        <TextInput
+          value={categoryName}
+          onChange={updateCategoryName}
+          placeholder="카테고리 이름을 작성해주세요"
+        ></TextInput>
+
+        <div style={{ paddingLeft: "2rem" }}>
+          {videoData?.map((video, idx) => (
+            <VideoInfo
+              key={`video-${idx}`}
+              videoData={video}
+              updateVideoData={(e) => updateVideoData(idx, e)}
+            />
+          ))}
+          <Button
+            type={"button"}
+            onClick={addVideoData}
+            style={{ float: "right" }}
+          >
+            +ADD VIDEO
+          </Button>
+        </div>
+      </div>
+    </>
   );
-};
-export default VideoCategory;
+}
+
+export default memo(VideoData);
