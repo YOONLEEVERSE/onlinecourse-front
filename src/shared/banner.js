@@ -2,12 +2,13 @@ import { Heading } from "grommet";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
+  position: relative;
   & > img {
     width: 350px;
   }
-  & > div:first-child {
-    position: relative;
-    top: 50px;
+  & > div:nth-child(2) {
+    position: absolute;
+    top: 10px;
     left: 10px;
     z-index: 100;
   }
@@ -39,21 +40,22 @@ const Description = styled.div`
   text-align: center;
   margin: 0;
 `;
+
 function Banner({
-  imgSrc = `${process.env.PUBLIC_URL}/img/MOKOKO_04.png`,
+  logo = `${process.env.PUBLIC_URL}/img/MOKOKO_04.png`,
   level = "초급",
   title = "title",
   subTitle = "subTitle",
 }) {
   return (
     <Wrapper>
+      <img src={logo} alt="Something went Wrong"></img>
       <LevelTag level={level}>{level}</LevelTag>
-      <img src={imgSrc} alt="Something went Wrong"></img>
       <Description>
-        <Heading size="small" level="2">
+        <Heading size="small" level="3">
           {title}
         </Heading>
-        <Heading size="small" level="4">
+        <Heading size="small" level="5">
           {subTitle}
         </Heading>
       </Description>
