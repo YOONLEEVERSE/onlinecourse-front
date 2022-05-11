@@ -4,10 +4,32 @@
  *
  */
 
-import { UPDATEVIDEO, NEWCOURSE, UPDATE_NEWCOURSE } from "./action";
+import {
+  UPDATEVIDEO,
+  NEWCOURSE,
+  UPDATE_NEWCOURSE,
+  LOGIN,
+  LOGOFF,
+} from "./action";
 import { cloneDeep } from "lodash";
 
-function defaultReducer(state = { newCourse: {}, addCourseInput: [] }, action) {
+function defaultReducer(
+  state = {
+    newCourse: {
+      title: "",
+      subTitle: "",
+      level: "초급",
+      logo: "",
+      color: ["#000000", "#000000", "#000000"],
+      gradientDirection: "0",
+      price: 0,
+    },
+    addCourseInput: [],
+    isLogin: false,
+    userData: {},
+  },
+  action
+) {
   switch (action.type) {
     case "INCRETE":
       return { ...state, count: action.count };
@@ -23,6 +45,16 @@ function defaultReducer(state = { newCourse: {}, addCourseInput: [] }, action) {
       const update = cloneDeep(state);
       update.addCourseInput[idx] = data;
       return update;
+
+    case LOGIN:
+      const userData = action.payload;
+      const newData = cloneDeep(state);
+      newData.isLogin = true;
+      newData.userData = userData;
+      return newData;
+
+    case LOGOFF:
+      return { ...state, isLogin: false, userData: {} };
 
     default:
       return state;
