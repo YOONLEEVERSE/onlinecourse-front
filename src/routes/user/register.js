@@ -2,10 +2,26 @@ import { TextInput, Box, Button, CheckBox } from "grommet";
 import { View, Hide } from "grommet-icons";
 import { useInput } from "../../hooks/useInput";
 import { useState, useCallback } from "react";
-export function Register() {
-  const { getState, handleChange } = useInput();
-  const [reveal, setReveal] = useState(false);
+import { SIGNUP } from "../../graphql/mutation";
+import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
 
+export function Register() {
+  const { getState, handleChange } = useInput({
+    email: "",
+    emailAgreed: false,
+    name: "",
+    reveal: false,
+    password: "",
+  });
+  const [reveal, setReveal] = useState(false);
+  const navigate = useNavigate();
+  const [signUp, { loading, data, error }] = useMutation(SIGNUP, {
+    onCompleted: (data) => {
+      console.log("회원가입 완", data);
+      navigate(-1);
+    },
+  });
   const MsBox = useCallback(({ children }) => {
     return (
       <Box
@@ -20,6 +36,15 @@ export function Register() {
       </Box>
     );
   }, []);
+
+  if (loading) {
+    return <div>로딩중</div>;
+  } else if (error) {
+    console.log("ERROR", error);
+    return <div>애러</div>;
+  } else if (data) {
+    console.log("성공", data);
+  }
 
   return (
     <>
@@ -77,7 +102,22 @@ export function Register() {
           onClick={() => setReveal(!reveal)}
         />
       </MsBox>
-      <Button primary onClick={(e) => console.log("출력", getState())}>
+      <Button
+        primary
+        onClick={(e) => {
+          e.preventDefault();
+          const { email, emailAgreed, password, name } = getState();
+          console.log("회원가입 드간다₩", {
+            email,
+            emailAgreed,
+            password,
+            name,
+          });
+          signUp({
+            variables: { email, emailAgreed, password, name },
+          });
+        }}
+      >
         회원가입
       </Button>
     </>
