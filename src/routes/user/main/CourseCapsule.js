@@ -1,49 +1,54 @@
 import styled from "styled-components";
 import { Heading } from "grommet";
 import Banner from "../../../shared/banner";
+import { useNavigate } from "react-router-dom";
 const CourseWrapper = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: start;
+  height: 250px;
+  & > div:first-child {
+    flex-grow: 1;
+  }
+  & > div:last-child {
+    flex-grow: 4;
+  }
 `;
 
 const Description = styled.div`
   & p:before {
     content: "\02295";
   }
+  
+
 `;
 
-export default function CourseCapsule({
-  courseName = "testName",
-  maintech = ["react", "framer"],
-  subtech = ["react", "framer", "ctech"],
-  summary = [
-    "106개",
-    "완강을 위한 2주 챌린지 프로그램",
-    "최신 버전으로 업데이트",
-  ],
-  link = "#",
-}) {
+export default function CourseCapsule({ data }) {
+  const { title, mainTechs, subTitle, level, logo, slug } = data;
+  const navigate = useNavigate();
+
   return (
-    <CourseWrapper>
-      <Banner techs={maintech + subtech} />
+    <CourseWrapper
+      onClick={(e) => {
+        navigate(`/pay/${slug}`);
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      <Banner level={level} title={title} subTitle={subTitle} logo={logo} />
       <Description>
         <Heading level="3" size="medium">
-          {courseName}
+          {title}
         </Heading>
         <div>
-          <img
-            src="https://nomadcoders.co/logos/react-query.svg"
-            alt="없대용 에메ㅔ베ㅔ베"
-            width="50px"
-          ></img>
-          <img
-            src="https://nomadcoders.co/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Freact-native.ce2e8aeb.png&w=1920&q=75"
-            alt="없대용 에메ㅔ베ㅔ베"
-            width="50px"
-          ></img>
-          <p>{summary[0]}</p>
-          <p>{summary[1]}</p>
-          <p>{summary[2]}</p>
+          {mainTechs.map((tech) => (
+            <img
+              src={tech.logo}
+              alt={tech.name}
+              key={tech.name}
+              width="50px"
+            ></img>
+          ))}
+          <p>{subTitle}</p>
         </div>
       </Description>
     </CourseWrapper>
