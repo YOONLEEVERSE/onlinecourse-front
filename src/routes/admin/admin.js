@@ -1,8 +1,6 @@
-import { gql } from "@apollo/client";
 import { Button, Heading } from "grommet";
 import { useNavigate } from "react-router-dom";
 import CourseTable from "./ManageCourse";
-
 import ManageTech from "./ManageTech";
 
 export function Admin() {

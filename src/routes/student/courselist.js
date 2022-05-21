@@ -4,6 +4,7 @@ import Banner from "../../shared/banner";
 import styled from "styled-components";
 import { useEffect, useState, memo } from "react";
 import { useQuery, gql } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
 
 const TechButton = memo(({ onClick, techName }) => (
   <div onClick={onClick}>
@@ -21,7 +22,6 @@ const TechBox = styled.div`
 
 const Filtering = ({ onChangeFilter, techs }) => {
   const [filter, setFilter] = useState({ level: "", price: "", tech: "" });
-  console.log(techs);
   function addFilteringCondition(kindOfFilter, filter) {
     setFilter((pre) => ({ ...pre, [kindOfFilter]: filter }));
   }
@@ -29,6 +29,7 @@ const Filtering = ({ onChangeFilter, techs }) => {
   useEffect(() => {
     onChangeFilter(filter);
   }, [filter]);
+
   return (
     <>
       <Grid
@@ -49,6 +50,7 @@ const Filtering = ({ onChangeFilter, techs }) => {
             onClick={() => {
               addFilteringCondition("level", "초급");
             }}
+            style={{}}
           >
             초급
           </Button>
@@ -96,14 +98,11 @@ const Filtering = ({ onChangeFilter, techs }) => {
             <TechButton
               key={`tech${data.id}`}
               techName={data.name}
-              onClick={() => addFilteringCondition("tech", data)}
+              onClick={() => addFilteringCondition("tech", data.id)}
             />
           ))}
         </Box>
       </Grid>
-      <p>{filter.level}</p>
-      <p>{filter.price}</p>
-      <p>{filter.tech}</p>
     </>
   );
 };
@@ -123,24 +122,32 @@ const GET_ALL_COURSE_AND_TECH = gql`
       logo
       techNames @client
     }
+
+    getAllTech {
+      id
+      name
+      logo
+    }
   }
 `;
 
 export function CourseList() {
-  const [filteredTechs, setFilteredTechs] = useState(null);
+  const [filteredCourses, setFilteredCourses] = useState(null);
   const {
     data: techs,
     error,
     loading,
   } = useQuery(GET_ALL_COURSE_AND_TECH, {
     onCompleted: (data) => {
-      console.log("GETALLCOURSE TEST LOCAL", data);
-      setFilteredTechs(data.getAllCourse);
+      console.log(data);
+      setFilteredCourses(data.getAllCourse);
     },
     onError: (error) => {
       console.error("HH?", error);
     },
   });
+
+  const navigate = useNavigate();
 
   function filteringTech(filter) {
     const filteredByLevel = filter.level
@@ -160,11 +167,13 @@ export function CourseList() {
       : filteredByLevel;
 
     const filteredByTech = filter.tech
-      ? filteredByPrice.filter((d) => d.mainTechs.includes(filter.tech))
+      ? filteredByPrice.filter((d) =>
+          d.mainTechs.some((tech) => tech.id === filter.tech)
+        )
       : filteredByPrice;
 
-    if (filteredTechs !== filteredByTech) {
-      setFilteredTechs(filteredByTech);
+    if (filteredCourses !== filteredByTech) {
+      setFilteredCourses(filteredByTech);
     }
   }
 
@@ -177,19 +186,19 @@ export function CourseList() {
         <Heading level="4" size="medium">
           초급부터 고급까지!
         </Heading>
-        {/* <Filtering
-          onChangeFilter={filteringTech}
-          techs={techs?.getAllTech ?? null}
-        /> */}
+        <Filtering onChangeFilter={filteringTech} techs={techs.getAllTech} />
         <TechBox>
-          {filteredTechs &&
-            filteredTechs.map((tech, idx) => (
+          {filteredCourses &&
+            filteredCourses.map((tech, idx) => (
               <Banner
                 title={tech.title}
                 subTitle={tech.subTitle}
                 level={tech.level}
-                imgSrc={tech.logo}
-                key={idx}
+                logo={tech.logo}
+                onClick={() => {
+                  navigate(`/detail/${tech.slug}`);
+                }}
+                key={`banner-${idx}`}
               ></Banner>
             ))}
         </TechBox>

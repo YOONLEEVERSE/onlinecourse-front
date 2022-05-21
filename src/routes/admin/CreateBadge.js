@@ -19,7 +19,7 @@ function CreateBadge(props, ref) {
     }));
   }
 
-  function IsOverFileSizeLimit(size) {
+  function isOverFileSizeLimit(size) {
     const LIMIT_SIZE = 1024; //제한 : 1MB
     const fileSize = (size / 1024).toFixed(4); //KB로 바꿈
     return fileSize > LIMIT_SIZE ? true : false;
@@ -28,7 +28,7 @@ function CreateBadge(props, ref) {
   function handleChange(e) {
     const file = fileInputRef.current.files[0];
     const { name, size, type } = file;
-    if (IsOverFileSizeLimit(size)) {
+    if (isOverFileSizeLimit(size)) {
       throw new Error("file is too big");
     }
     const imageSrc = URL.createObjectURL(e.target.files[0]);

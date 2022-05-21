@@ -6,18 +6,13 @@ import { GET_ALL_COURSE } from "../../../graphql/query";
 import { useEffect } from "react";
 
 export function Main({ playtime = 3000 }) {
-  const { data } = useQuery(GET_ALL_COURSE, {
-    onCompleted: (data) => {
-      console.log("why ENROLLEMENT ERROR?", data);
-    },
-  });
+  const { data } = useQuery(GET_ALL_COURSE);
   const client = useApolloClient();
   useEffect(() => {
     const test = client.readQuery({ query: GET_ALL_COURSE });
-    console.log("캐싱 데이터", test);
   }, [data]);
 
-  if (data) {
+  if (data && data.length > 0) {
     return (
       <>
         <Heading level="3" size="medium">
@@ -46,5 +41,7 @@ export function Main({ playtime = 3000 }) {
         </Heading>
       </>
     );
+  } else {
+    return <div>데이터가 없음</div>;
   }
 }

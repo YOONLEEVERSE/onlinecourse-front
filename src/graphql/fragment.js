@@ -15,24 +15,3 @@ export const ResultInfo = gql`
     error
   }
 `;
-// const CourseType = gql`
-//   fragment CourseInfo on CourseType {
-//     courseId
-//     title
-//     subTitle
-//     logo
-//     mainColor
-//     level
-//     price
-//     mainTechs{
-
-//     }
-//     prerequisite {
-//       ...CourseInfo
-//     }
-//     videoCategories {
-//       categoryId
-//       title
-//     }
-//   }
-// `;

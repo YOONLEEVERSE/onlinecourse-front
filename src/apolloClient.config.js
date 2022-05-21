@@ -48,20 +48,7 @@ const localState = {
 
 export const apolloClient = new ApolloClient({
   link: httpLink,
-  cache: new InMemoryCache({
-    typePolicies: {
-      CourseType: {
-        keyFields: ["slug"],
-        fields: {
-          techNames: {
-            read(title, _) {
-              return title;
-            },
-          },
-        },
-      },
-    },
-  }),
+  cache: new InMemoryCache(localState),
 });
 
 export function updateGraphqlHeaders() {

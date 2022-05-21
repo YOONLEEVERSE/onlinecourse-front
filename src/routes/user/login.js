@@ -12,7 +12,7 @@ export function Login() {
   const { getState, handleChange } = useInput();
   const [reveal, setReveal] = useState(false);
   const { authorization } = useLogin();
-  const [signIn, { loading, error, data, client }] = useMutation(SIGNIN);
+  const [signIn, { loading, error, data }] = useMutation(SIGNIN);
   const navigate = useNavigate();
   if (loading) return <p>loading...</p>;
   else if (error) {
@@ -86,11 +86,3 @@ export function Login() {
     </>
   );
 }
-//name, email, emailverify,password,passwordDoubleCheck
-
-/**
- * name: String
-email: String
-emailAgreed: Boolean
-password: String
- */

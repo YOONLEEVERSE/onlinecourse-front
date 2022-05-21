@@ -42,13 +42,16 @@ export const GET_ALL_COURSE = gql`
         title
       }
       videoCategories {
-        categoryId
+        id
         title
         videos {
           videoId
           title
           time
           link
+          freePreview
+          text
+          isCompleted
         }
       }
     }
