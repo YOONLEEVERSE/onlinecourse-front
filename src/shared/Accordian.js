@@ -1,66 +1,35 @@
 import { Accordion, AccordionPanel, Box, Text } from "grommet";
-import { useState } from "react";
-const dummytitles = [
-  "[2021UPDATE] INTRODUCTION",
-  "ONE SECTIKON",
-  "TWO SECTION",
-];
-const dummy = [
-  { section: 1, name: "one", playtime: 259, link: "#" },
-  { section: 1, name: "two", playtime: 300, link: "#" },
-  { section: 2, name: "2-1", playtime: 300, link: "#" },
-  { section: 2, name: "2-2", playtime: 300, link: "#" },
-  { section: 2, name: "2-3", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-  { section: 3, name: "3-1", playtime: 300, link: "#" },
-];
-
-const InnerBox = ({ content }) => (
-  <Box pad="small" background="light-2">
-    <Text>{content}</Text>
-  </Box>
-);
 
 const InnerContent = ({ selected }) => {
   return (
     <>
       {selected.map((select, idx) => {
         return (
-          <InnerBox
-            key={`inner-${select.section}-${idx}`}
-            content={select.name}
-          />
+          <Box pad="small" background="light-2" key={select.title + idx}>
+            <Text>{select.title}</Text>
+            <Text>{select.time}</Text>
+          </Box>
         );
       })}
     </>
   );
 };
 
-function AccordianSection({
-  titles = dummytitles,
-  contents = dummy,
-  openAll = false,
-}) {
+function AccordianSection({ data, openAll }) {
+  console.log("DATA", data);
+  console.log("OPENALL", openAll);
+  //video ID를 보내주는 편으로 하는 게 좋겠구만.1
   return (
     <Accordion
-      activeIndex={openAll ? [...Array(contents.length).keys()] : undefined}
+      activeIndex={openAll ? [...Array(data.length).keys()] : undefined}
     >
-      {titles.map((title, idx) => {
-        const section = idx + 1;
-        const selected = contents.filter(
-          (content) => content.section === section
-        );
+      {data.map((category, idx) => {
         return (
-          <AccordionPanel key={`selected-section-${idx + 1}`} label={title}>
-            <InnerContent selected={selected} />
+          <AccordionPanel
+            key={`selected-section-${idx + 1}`}
+            label={category.title}
+          >
+            <InnerContent selected={category.videos} />
           </AccordionPanel>
         );
       })}

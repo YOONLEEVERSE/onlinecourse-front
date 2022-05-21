@@ -46,9 +46,10 @@ function Banner({
   level = "초급",
   title = "title",
   subTitle = "subTitle",
+  onClick = null,
 }) {
   return (
-    <Wrapper>
+    <Wrapper onClick={onClick}>
       <img src={logo} alt="Something went Wrong"></img>
       <LevelTag level={level}>{level}</LevelTag>
       <Description>
