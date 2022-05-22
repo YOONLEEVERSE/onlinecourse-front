@@ -24,6 +24,7 @@
     "subscriptions-transport-ws": "^0.11.0"
   },
   "scripts": {
+    "secure": "HTTPS=true SSL_CRT_FILE=_wildcard.test.com.pem SSL_KEY_FILE=_wildcard.test.com-key.pem HOST=0.0.0.0 react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -46,5 +47,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {}
 }
