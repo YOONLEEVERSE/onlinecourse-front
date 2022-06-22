@@ -7,6 +7,7 @@ import { GlobalTheme } from "./globalStyle";
 import store from "./store/index";
 import { ApolloProvider } from "@apollo/client";
 import { apolloClient } from "./apolloClient.config";
+import { AlertProvider } from "./shared/Alert";
 
 //import { WebSocketLink } from "@apollo/client/link/ws";
 //bottom. for the subscriptions apollo client에서 추천하는 최신버전. 근데 서버에서 apollo-server말고 다른 거 써서 거기 버전에 맞게 수정했음.
@@ -21,8 +22,10 @@ root.render(
   <ApolloProvider client={apolloClient}>
     <Router>
       <Provider store={store}>
-        <App />
-        <GlobalTheme />
+        <AlertProvider>
+          <App />
+          <GlobalTheme />
+        </AlertProvider>
       </Provider>
     </Router>
   </ApolloProvider>
