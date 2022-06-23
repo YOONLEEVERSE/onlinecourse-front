@@ -1,12 +1,18 @@
 import { Heading, Button, Box, Card } from "grommet";
 import { Alarm } from "grommet-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Accordion from "../../shared/Accordian";
 import styled from "styled-components";
+import { gql, useQuery } from "@apollo/client";
+import { useRef } from "react";
 const TitleSection = styled.section`
   width: 100%;
   height: 250px;
-  background-image: linear-gradient(#5b94ec, gray);
+  background-image: ${(props) =>
+    props.backgroundColor
+      ? props.backgroundColor
+      : "linear-gradient(#5b94ec, gray)"};
 `;
 
 const LevelSectionStyle = styled.div`
@@ -57,117 +63,177 @@ const LevelSection = ({
   );
 };
 
-export function Detail({
-  title = "TEST COURSE",
-  techs = "React, React-Query",
-  level = "초급",
-}) {
-  return (
-    <>
-      <TitleSection>
+const GET_COURSE = gql`
+  query getCourse($slug: String) {
+    getCourse(slug: $slug) {
+      title
+      slug
+      subTitle
+      logo
+      mainColor
+      level
+      price
+      progress
+      progressVideos
+      isEnrolled
+      mainTechs {
+        id
+        name
+        logo
+      }
+      prerequisite {
+        title
+      }
+      videoCategories {
+        title
+        categoryId
+        videos {
+          videoId
+          title
+          time
+          link
+          freePreview
+          text
+          isCompleted
+        }
+      }
+    }
+  }
+`;
+
+export function Detail() {
+  const { slug } = useParams();
+  const { data, loading, error } = useQuery(GET_COURSE, {
+    variables: { slug },
+    onCompleted: (data) => console.log("DATA", data),
+    onError: (error) => console.log("ERROR", error),
+  });
+  const payRef = useRef(null);
+  const navigate = useNavigate();
+  const executeScroll = () => payRef.current.scrollIntoVieew();
+  if (data) {
+    return (
+      <>
+        <TitleSection backgroundColor={data.getCourse.mainColor}>
+          <Heading level="2" size="medium">
+            {data.getCourse.title}
+          </Heading>
+          <Heading level="3" size="medium">
+            {data.getCourse.subTitle}
+          </Heading>
+          <Heading level="4" size="medium">
+            {data.getCourse.level}
+          </Heading>
+          <div>
+            {data.getCourse.mainTechs.map((tech) => {
+              return (
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "50px",
+                    marginRight: "1rem",
+                  }}
+                  key={tech.name}
+                >
+                  <img alt="이미지 없음" src={tech.logo} width="50px"></img>
+                </span>
+              );
+            })}
+          </div>
+
+          <Button primary style={{ padding: "10px" }} onClick={executeScroll}>
+            Start Coding Now!
+          </Button>
+        </TitleSection>
+
         <Heading level="2" size="medium">
-          {title}
+          Start Coding Now!
         </Heading>
         <Heading level="3" size="medium">
-          {techs}
+          풀스택 로켓에 지금 올라타세요-!
         </Heading>
-        <Heading level="4" size="medium">
-          {level}
-        </Heading>
-        <div>
-          <img
-            src="https://nomadcoders.co/logos/react-query.svg"
-            alt="없대용 에메ㅔ베ㅔ베"
-            width="50px"
-          ></img>
-          <img
-            src="https://nomadcoders.co/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Freact-native.ce2e8aeb.png&w=1920&q=75"
-            alt="없대용 에메ㅔ베ㅔ베"
-            width="50px"
-          ></img>
-        </div>
-        <Button primary style={{ padding: "10px" }}>
-          Start Coding Now!
-        </Button>
-      </TitleSection>
-
-      <Heading level="2" size="medium">
-        Start Coding Now!
-      </Heading>
-      <Heading level="3" size="medium">
-        풀스택 로켓에 지금 올라타세요-!
-      </Heading>
-      <Box>
-        <Heading level="3" size="medium" color="whitegray ">
-          이 정도 수준인분들 드루와요~
-        </Heading>
-        <LevelSection isFree={true} techs={["바닐라 JS"]}></LevelSection>
-        <LevelSection></LevelSection>
-      </Box>
-      <Box
-        direction="row"
-        background={{ color: "black " }}
-        color="white"
-        pad="medium"
-      >
-        <section style={{ width: "50%" }}>
-          <Heading level="3" size="medium" color="white">
-            Lifetime Access
+        <Box>
+          <Heading level="3" size="medium" color="whitegray ">
+            이 정도 수준인분들 드루와요~
           </Heading>
-          <p style={{ wordWrap: "break-word" }}>
-            본인이 원하시는 시간에, 본인에게 맞는 속도와 스피드로 페이스를
-            조정하여, 언제든지 다시 반복하여 들을 수 있는 온라인 수업입니다.
-          </p>
-
-          <div>
-            <p style={{ display: "inline-block", color: "#5b94ec" }}>
-              WHAT'S INCLUDED
-            </p>
-            <span
-              style={{
-                display: "inline-block",
-                width: "150px",
-                border: "1px solid gray",
-              }}
-            ></span>
-          </div>
-          <Box direction="row" flex style={{ flexWrap: "wrap" }}>
-            <Card width={"40%"}>강의 평생 소장</Card>
-            <Card width={"40%"}>2주 완성반 챌린지</Card>
-            <Card width={"40%"}>100% 한글자막</Card>
-            <Card width={"40%"}>니꼬쌤 질의응답</Card>
-          </Box>
-        </section>
-        <section style={{ width: "30%" }}>
-          <p color="whitesmoke">Pay once, own it forever</p>
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <Heading level="2" size="medium" color="white">
-              월 2,4000
+          <LevelSection isFree={true} techs={["바닐라 JS"]}></LevelSection>
+          <LevelSection></LevelSection>
+        </Box>
+        <Box
+          direction="row"
+          background={{ color: "black " }}
+          color="white"
+          pad="medium"
+          ref={payRef}
+        >
+          <section style={{ width: "50%" }}>
+            <Heading level="3" size="medium" color="white">
+              Lifetime Access
             </Heading>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Heading level="4" size="medium" color="whitesmoke">
-                원
-              </Heading>
-              <Heading level="5" size="medium" color="whitesmoke">
-                (할부 5개월)
-              </Heading>
-            </div>
-          </div>
+            <p style={{ wordWrap: "break-word" }}>
+              본인이 원하시는 시간에, 본인에게 맞는 속도와 스피드로 페이스를
+              조정하여, 언제든지 다시 반복하여 들을 수 있는 온라인 수업입니다.
+            </p>
 
-          <Button color="brand">결제하기</Button>
-        </section>
-      </Box>
-      <Box>
-        <Heading level="3" size="medium" color="whitegray ">
-          상세 커리큘럼
-        </Heading>
-        <Heading level="4" size="medium" color="whitegray ">
-          수업 내용을 직접 들어보고 결정하세요!
-        </Heading>
-        <Accordion />
-      </Box>
-    </>
-  );
+            <div>
+              <p style={{ display: "inline-block", color: "#5b94ec" }}>
+                WHAT'S INCLUDED
+              </p>
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "150px",
+                  border: "1px solid gray",
+                }}
+              ></span>
+            </div>
+            <Box direction="row" flex style={{ flexWrap: "wrap" }}>
+              <Card width={"40%"}>강의 평생 소장</Card>
+              <Card width={"40%"}>2주 완성반 챌린지</Card>
+              <Card width={"40%"}>100% 한글자막</Card>
+              <Card width={"40%"}>니꼬쌤 질의응답</Card>
+            </Box>
+          </section>
+          <section style={{ width: "30%" }}>
+            <p color="whitesmoke">Pay once, own it forever</p>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <Heading level="2" size="medium" color="white">
+                월 {data.getCourse.price / 5}
+              </Heading>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Heading level="4" size="medium" color="whitesmoke">
+                  원
+                </Heading>
+                <Heading level="5" size="medium" color="whitesmoke">
+                  (할부 5개월)
+                </Heading>
+              </div>
+            </div>
+
+            <Button
+              color="brand"
+              onClick={() => {
+                navigate(`/pay/${slug}`);
+              }}
+            >
+              결제하기
+            </Button>
+          </section>
+        </Box>
+        <Box>
+          <Heading level="3" size="medium" color="whitegray ">
+            상세 커리큘럼
+          </Heading>
+          <Heading level="4" size="medium" color="whitegray ">
+            수업 내용을 직접 들어보고 결정하세요!
+          </Heading>
+          <Accordion data={data.getCourse.videoCategories} />
+        </Box>
+      </>
+    );
+  } else {
+    return <p>loading...</p>;
+  }
 }
 
 //만들 것
