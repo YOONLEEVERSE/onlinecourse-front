@@ -103,7 +103,7 @@ const GET_COURSE = gql`
 
 export function Detail() {
   const { slug } = useParams();
-  const { data, loading, error } = useQuery(GET_COURSE, {
+  const { data } = useQuery(GET_COURSE, {
     variables: { slug },
     onCompleted: (data) => console.log("DATA", data),
     onError: (error) => console.log("ERROR", error),
