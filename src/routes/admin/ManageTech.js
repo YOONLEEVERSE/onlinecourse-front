@@ -2,10 +2,32 @@ import { Button, FormField, TextInput } from "grommet";
 import { useMutation, useQuery } from "@apollo/client";
 import { Add } from "grommet-icons";
 import { GET_ALL_TECH } from "../../graphql/query";
-import { ADD_TECH_TEST } from "../../graphql/mutation";
-import { useState, useRef, useEffect } from "react";
+import { ADD_TECH_TEST, REMOVE_TECH } from "../../graphql/mutation";
+import { useState, useRef } from "react";
 import CreateBadge from "./CreateBadge";
 import Modal from "../../shared/modal";
+import styled from "styled-components";
+
+const Tech = styled.span`
+  &:hover {
+    position: relative;
+    cursor: pointer;
+    &:after {
+      content: "삭제";
+      position: absolute;
+      color: white;
+      width: 64px;
+      height: 64px;
+      line-height: 64px;
+      text-align: center;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.7);
+      top: 0;
+      left: 0;
+      opacity: 1;
+    }
+  }
+`;
 
 function ManageTech() {
   const [isOn, setIsOn] = useState(false);
@@ -13,6 +35,9 @@ function ManageTech() {
   const titleRef = useRef(null);
   const { data, loading, refetch } = useQuery(GET_ALL_TECH);
   const [addTechMutation] = useMutation(ADD_TECH_TEST, {
+    onCompleted: () => refetch(),
+  });
+  const [removeTech] = useMutation(REMOVE_TECH, {
     onCompleted: () => refetch(),
   });
 
@@ -30,16 +55,19 @@ function ManageTech() {
       <>
         {techlist.map((tech) => {
           return (
-            <span
+            <Tech
               style={{
                 display: "inline-block",
                 width: "70px",
               }}
               key={tech.name}
+              onClick={() => {
+                removeTech({ variables: { id: +tech.id } });
+              }}
             >
               <img alt="이미지 없음" src={tech.logo} width="64px"></img>
               <p style={{ textAlign: "center" }}>{tech.name}</p>
-            </span>
+            </Tech>
           );
         })}
       </>
@@ -57,7 +85,7 @@ function ManageTech() {
         <Button
           primary
           onClick={async () => {
-            const imgSrc = ResultImgRef.current?.src; //파일 그대로 업로드~
+            const imgSrc = ResultImgRef.current?.src; //파일 그대로 업로드
             const imgBlob = await (await fetch(imgSrc)).blob(); //base64 to blob
             const title = titleRef.current?.value;
             const imgFile = new File(

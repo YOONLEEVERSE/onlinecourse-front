@@ -54,6 +54,8 @@ function defaultReducer(
       return newData;
 
     case LOGOFF:
+      console.log("로그오프!");
+      localStorage.removeItem("accessToken");
       return { ...state, isLogin: false, userData: {} };
 
     default:

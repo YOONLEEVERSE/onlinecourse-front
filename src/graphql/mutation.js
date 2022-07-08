@@ -9,6 +9,7 @@ export const SIGNIN = gql`
       }
       accessToken
       success
+      error
     }
   }
 `;

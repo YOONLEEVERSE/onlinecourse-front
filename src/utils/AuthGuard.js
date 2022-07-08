@@ -13,5 +13,5 @@ export default function AuthGuard({ children }) {
   }, [isLogin]);
 
   if (isLogin) return children;
-  else return <p>권한을 확인중입니다. </p>;
+  else <p>Loading..</p>;
 }

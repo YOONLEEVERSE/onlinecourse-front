@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { ThemeProvider } from "styled-components";
-import { defaultTheme } from "../styleTheme";
+import { defaultTheme } from "../styles/styleTheme";
 
 const Multisteps = styled.ul`
   display: table;

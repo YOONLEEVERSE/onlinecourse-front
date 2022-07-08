@@ -36,3 +36,11 @@ export const login = (userData = null) => {
     payload: { ...userData },
   };
 };
+
+export const logoff = () => {
+  //data에는 idx, title ,video데이터이 있어야 함.
+
+  return {
+    type: LOGOFF,
+  };
+};

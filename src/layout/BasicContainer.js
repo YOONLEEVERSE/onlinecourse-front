@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
-import AuthGuard from "../utiles/AuthGuard";
+import AuthGuard from "../utils/AuthGuard";
+
 const ContainerStyle = styled.div`
   width: 100%;
   max-width: 1200px;
